@@ -1,0 +1,90 @@
+<?xml version="1.0"?>
+<block>
+  <name>wx_radar_py_f</name>
+  <key>radiationpattern_wx_radar_py_f</key>
+  <category>radiationpattern</category>
+  <import>import radiationpattern</import>
+        <import>from gnuradio import wxgui</import>
+  <make>#set $parent = $notebook() and 'self.%s.GetPage(%s)'%$notebook() or 'self'
+radiationpattern.wx_radar_py_f(
+  parent=$(parent).GetWin(),
+  minval=$minval,
+  maxval=$maxval,
+  revolution_time=$revolution_time,
+  sample_rate=$sample_rate,
+  graphing_rate=$graphing_rate,
+#if $win_size()
+  size=$win_size,
+#end if
+)
+#if not $grid_pos()
+$(parent).Add(self.$(id).win)
+#else
+$(parent).GridAdd(self.$(id).win, $(', '.join(map(str, $grid_pos()))))
+#end if</make>
+
+  <!-- Make one 'param' node for every Parameter you want settable from the GUI.
+       Sub-nodes:
+       * name
+       * key (makes the value accessible as $keyname, e.g. in the make node)
+       * type -->
+  <param>
+    <name>minval</name>
+    <key>minval</key>
+    <type>float</type>
+  </param>
+  <param>
+    <name>maxval</name>
+    <key>maxval</key>
+    <type>float</type>
+  </param>
+  <param>
+    <name>revolution_time</name>
+    <key>revolution_time</key>
+    <type>float</type>
+  </param>
+  <param>
+    <name>sample_rate</name>
+    <key>sample_rate</key>
+    <type>float</type>
+  </param>
+  <param>
+    <name>graphing_rate</name>
+    <key>graphing_rate</key>
+    <type>float</type>
+  </param>
+
+  <!-- the following parameters seem to be neccessary for graphical wx blocks -->
+  <param>
+    <name>Window Size</name>
+    <key>win_size</key>
+    <value></value>
+    <type>int_vector</type>
+    <hide>#if $win_size() then 'none' else 'part'#</hide>
+  </param>
+  <param>
+    <name>Grid Position</name>
+    <key>grid_pos</key>
+    <value></value>
+    <type>grid_pos</type>
+  </param>
+  <param>
+    <name>Notebook</name>
+    <key>notebook</key>
+    <value></value>
+    <type>notebook</type>
+  </param>
+  <check>not $win_size or len($win_size) == 2</check>
+
+  <!-- Make one 'sink' node per input. Sub-nodes:
+       * name (an identifier for the GUI)
+       * type
+       * vlen
+       * optional (set to 1 for optional inputs) -->
+  <sink>
+    <name>in</name>
+    <type>float</type>
+  </sink>
+
+
+</block>
