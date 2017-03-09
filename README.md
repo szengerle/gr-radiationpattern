@@ -37,32 +37,39 @@ Instructions
 ============
 
 1. Install dependencies:
-	On Ubuntu:
-  		sudo apt-get install gnuradio gr-osmosdr python python-serial cmake build-essential python-matplotlib python-numpy python-pexpect
 
-  	On Arch:
-  		sudo pacman -S gnuradio gr-osmosdr python2 python2-serial cmake build-essential python2-matplotlib python2-numpy python2-pexpect
+   On Ubuntu:
+
+        sudo apt-get install cmake build-essential \
+                       gnuradio gr-osmosdr python python-serial \
+                       python-matplotlib python-numpy python-pexpect
+
+   On Arch:
+
+        sudo pacman -S cmake build-essential \
+                       gnuradio gr-osmosdr python2 python2-serial \
+                       python2-matplotlib python2-numpy python2-pexpect
 
 
 2. Compile and install the module gr-radiationpattern:
 
-	mkdir build
-	cd build
-	cmake .. && make && sudo make install && sudo ldconfig
+        mkdir build
+        cd build
+        cmake .. && make && sudo make install && sudo ldconfig
 
 
 3. Run:
-	- connect the motor control board and the hackrf to the USB
-	- make sure your user account has permission on the USB serial port, e.g. sudo chmod 0666 /dev/ttyACM0
-	- open examples/receive.grc with gnuradio companion, run it
-	- on an other computer, run examples/transmit.grc
-	- click on "Start measurement"
-	- ???
-	- PROFIT
+   - connect the motor control board and the hackrf to the USB
+   - make sure your user account has permission on the USB serial port, e.g. `sudo chmod 0666 /dev/ttyACM0`
+   - open *examples/receive.grc* with gnuradio companion, run it
+   - on an other computer, run *examples/transmit.grc*
+   - click on *Start measurement*
+   - *???*
+   - **PROFIT**
 
 
-The interesting python code for the radiation pattern is python/antenna_diagram.py and python/antdiag_window.py. These files are modified versions of wxgui/numbersink2.py and wxgui/number_window.py from the GNUradio distribution.
+The interesting python code for the radiation pattern is *python/antenna_diagram.py* and *python/antdiag_window.py*. These files are modified versions of *wxgui/numbersink2.py* and *wxgui/number_window.py* from the GNUradio distribution.
 
-There is a slightly different version of the antenna_diagram block called wx_radar_py_f which displays an endless updated radar-screen-like polar plot.
+There is a slightly different version of the *antenna_diagram* block called *wx_radar_py_f* which displays an endless updated radar-screen-like polar plot.
 
 
