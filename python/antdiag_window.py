@@ -104,19 +104,19 @@ class control_panel(wx.Panel):
             serport = serial.Serial('/dev/ttyACM0', 115200)
             return serport
 
-        def move_return():
-            with openserial() as serport:
-                ser = fdpexpect.fdspawn(serport)
-                ser.sendline('set speed 960')
-                ser.expect('OK')
-                ser.sendline('mb 3200')
-                ser.expect('OK')
-                ser.sendline('wait')
-                ser.expect('Waiting')
-                print("Moving back to start position")
-                ser.expect('OK, done')
-                time.sleep(1)
-
+        # def move_return():
+        #     with openserial() as serport:
+        #         ser = fdpexpect.fdspawn(serport)
+        #         #ser.sendline('set speed 960')
+        #         #ser.expect('OK')
+        #         ser.sendline('mb 3200')
+        #         ser.expect('OK')
+        #         ser.sendline('wait')
+        #         ser.expect('Waiting')
+        #         print("Moving back to start position")
+        #         ser.expect('OK, done')
+        #         time.sleep(1)
+        #
 
 
         def start_measure_quick(v):
@@ -127,33 +127,23 @@ class control_panel(wx.Panel):
         def measure_thread_quick():
             try:
                 parent[WORKING_KEY] = True
-                move_return()
+                #move_return()
                 with openserial() as serport:
                     ser = fdpexpect.fdspawn(serport)
                     print ("Starting measurement")
 
-                    ser.sendline('set speed %s' % parent[ROTATION_SPEED_KEY])
+                    #ser.sendline('set speed %s' % parent[ROTATION_SPEED_KEY])
                     parent.calculate_rates()
 
+                    ser.sendline('C')
                     ser.expect('OK')
-
-                    #parent.data = []
-                    parent[RUNNING_KEY] = True
-                    ser.sendline('mf 3200')
-                    ser.expect('OK')
-                    ser.sendline('wait')
-                    ser.expect('Waiting')
                     print("Running measurement...")
-                    choice = ser.expect(['OK, done', 'TIMEOUT', 'antennenlab', 'assertion failed'], timeout=int(parent.revolution_time)+1)
-                    if choice == 0:
-                        pass # success
-                    elif choice == 1:
-                        print("TIMEOUT!")
-                    else:
-                        print("ERROR/RESET in microcontroller")
-
-                    parent[RUNNING_KEY] = False
+                    ser.expect('FINISH')
                     print("Finished.")
+                    ser.sendline('B')
+                    ser.expect('OK')
+                    print("go back...")
+                    ser.expect('FINISH')
             finally:
                 parent[WORKING_KEY] = False
 
@@ -217,7 +207,7 @@ class antdiag_window(wx.Panel, pubsub.pubsub):
 
     def calculate_rates(self):
         speed = int(self[ROTATION_SPEED_KEY]) # pulses/second
-        stepping = 1.0/16 # microstepping 1/16 (mode 0x04)
+        stepping = 1.0/8 # microstepping 1/16 (mode 0x04)
         degrees_per_step = 1.8
         self.revolution_time = 360.0 / (float(speed) * stepping * degrees_per_step)
 
@@ -252,7 +242,7 @@ class antdiag_window(wx.Panel, pubsub.pubsub):
         self.draw_fps=1 # frames per second
         self.draw_spf=1/self.draw_fps
         self.draw_next=time.time()+self.draw_spf
-        
+
 
         self.peak_val_real = NEG_INF
         #self.peak_val_imag = NEG_INF
@@ -292,7 +282,7 @@ class antdiag_window(wx.Panel, pubsub.pubsub):
 
         self.init_plot(minval, maxval)
         self.canvas = FigCanvas(self, -1, self.fig)
-        sizer.Add(self.canvas, 1, flag=wx.LEFT | wx.RIGHT | wx.GROW)  
+        sizer.Add(self.canvas, 1, flag=wx.LEFT | wx.RIGHT | wx.GROW)
 
         #hide/show gauges
         self.show_gauges(True)
@@ -337,13 +327,13 @@ class antdiag_window(wx.Panel, pubsub.pubsub):
                 self.data_ptr += 1
                 if self.data_ptr >= self.samples_per_revolution:
                     self.data_ptr = 0
-            
+
             if (self[RUNNING_KEY] or self.draw_pending) \
                      and (self.draw_next <= time.time()):
                 self.draw_plot()
                 self.draw_next=time.time()+self.draw_spf
                 self.draw_pending = self[RUNNING_KEY]
-            
+
         except Exception,e:
             print e
 
@@ -360,23 +350,23 @@ class antdiag_window(wx.Panel, pubsub.pubsub):
         self.axes.set_title('Radiation pattern', size=10)
 
         print "init_plot 2"
-        
+
         xmin=0
         xmax=2*numpy.pi
         self.axes.set_xbound(lower=xmin, upper=xmax)
         self.axes.grid(True, color='gray')
 
         print "init_plot 3"
-        
+
         pylab.setp(self.axes.get_xticklabels(), fontsize=8)
         pylab.setp(self.axes.get_yticklabels(), fontsize=8)
         pylab.setp(self.axes.get_xticklabels(), visible=True)
 
-        # plot the data as a line series, and save the reference 
+        # plot the data as a line series, and save the reference
         # to the plotted line series
         #
         self.plot_data = self.axes.plot(
-            self.data, 
+            self.data,
             linewidth=1,
             color=(1, 1, 0),
             )[0]
@@ -396,4 +386,3 @@ class antdiag_window(wx.Panel, pubsub.pubsub):
         self.plot_data.set_ydata(numpy.array(self.data))
 
         self.canvas.draw()
-

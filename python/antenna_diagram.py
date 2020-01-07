@@ -1,23 +1,23 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# 
+#
 # Copyright 2017 <+YOU OR YOUR COMPANY+>.
-# 
+#
 # This is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 3, or (at your option)
 # any later version.
-# 
+#
 # This software is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this software; see the file COPYING.  If not, write to
 # the Free Software Foundation, Inc., 51 Franklin Street,
 # Boston, MA 02110-1301, USA.
-# 
+#
 
 import numpy
 from gnuradio import gr
@@ -34,7 +34,7 @@ class antenna_diagram(gr.hier_block2, common.wxgui_hb):
     """
     radar plot sink
     """
-    def __init__(self, 
+    def __init__(self,
         parent,
         minval=0,
         maxval=1,
@@ -42,8 +42,8 @@ class antenna_diagram(gr.hier_block2, common.wxgui_hb):
         graphing_rate=1,
         size=antdiag_window.DEFAULT_WIN_SIZE,
         peak_hold=False,
-        serial_port='/dev/ttyACM0',
-        rotation_speed=100,
+        serial_port='/dev/ttyUSB0',
+        rotation_speed=60,
         **kwargs #catchall for backwards compatibility
         ):
             #init
@@ -127,7 +127,7 @@ class test_app_flow_graph(stdgui2.std_top_block):
         # suck down all the CPU available.  Normally you wouldn't use these.
         thr1 = blocks.throttle(gr.sizeof_float, input_rate)
 
-        sink1 = antenna_diagram(panel, 
+        sink1 = antenna_diagram(panel,
              sample_rate=input_rate,
              graphing_rate=10,
              revolution_time=4,
@@ -143,5 +143,3 @@ def main ():
 
 if __name__ == '__main__':
     main()
-
-
